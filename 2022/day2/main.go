@@ -103,7 +103,7 @@ func answerOne(inputPath string) (int, error) {
 				score += 3 // 3 pts for draw
 			}
 		default:
-			fmt.Printf("unkown case: %q. Please verify input is correct.\n", me)
+			fmt.Printf("unknown case: %q. Please verify input is correct.\n", me)
 		}
 	}
 	return score, nil
@@ -161,7 +161,7 @@ func answerTwo(inputPath string) (int, error) {
 				score += 6 // 6 pts for win
 			}
 		default:
-			fmt.Printf("unkown case: %q. Please verify input is correct.\n", me)
+			fmt.Printf("unknown case: %q. Please verify input is correct.\n", me)
 		}
 	}
 	return score, nil
