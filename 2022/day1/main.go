@@ -26,10 +26,9 @@ func answerOne(inputPath string) {
 
 	scanner := bufio.NewScanner(f)
 	elfToCalorieMap := make(map[int]int)
-	var elfCount int
+	elfCount := 1
 	var calorieCount int
 	for scanner.Scan() {
-		elfCount++
 		currentLine := scanner.Text()
 		if currentLine == "" {
 			elfToCalorieMap[elfCount] = calorieCount
@@ -59,10 +58,9 @@ func answerTwo(inputPath string) {
 
 	scanner := bufio.NewScanner(f)
 	elfToCalorieMap := make(map[int]int)
-	var elfCount int
+	elfCount := 1
 	var calorieCount int
 	for scanner.Scan() {
-		elfCount++
 		currentLine := scanner.Text()
 		if currentLine == "" {
 			elfToCalorieMap[elfCount] = calorieCount
