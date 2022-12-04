@@ -1,10 +1,10 @@
-// create map[string]bool
-// split line into two compartments
-// loop over first compartment
-// do a nested loop of the second compartment
-// check if value of the current iterator of second compartment matches first compartment
-// if it DOES, set value to true in the map
-// if it DOESN't, set value to false
+/*
+part one plan:
+split line into two halves
+loop over characters in first half
+use strings.Contains to check if current iterator is found in right half
+if found, add to sum
+*/
 
 package main
 
