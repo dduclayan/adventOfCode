@@ -36,7 +36,6 @@ func check(err error) {
 func answerOne(filePath string) (int, error) {
 	var sum int
 	priorityMap := points.NewLettersToPointsMap()
-	fmt.Println(priorityMap)
 	f, err := os.Open(filePath)
 	if err != nil {
 		return 0, err
@@ -49,7 +48,6 @@ func answerOne(filePath string) (int, error) {
 		rightHalf := scanner.Text()[len(scanner.Text())/2:]
 		for _, charA := range leftHalf {
 			if strings.Contains(rightHalf, string(charA)) {
-				fmt.Printf("match found! line: %v, left half: %v, right half: %v, matching char: %q, priority value: %v\n", lineCounter, leftHalf, rightHalf, string(charA), priorityMap[string(charA)])
 				sum += priorityMap[string(charA)]
 				break
 			}
