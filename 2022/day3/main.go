@@ -25,6 +25,10 @@ func main() {
 	answer, err := answerOne(testDataPath)
 	check(err)
 	fmt.Println(answer)
+
+	answer2, err := answerTwo(testDataPath)
+	check(err)
+	fmt.Println(answer2)
 }
 
 func check(err error) {
@@ -50,6 +54,36 @@ func answerOne(filePath string) (int, error) {
 			if strings.Contains(rightHalf, string(charA)) {
 				sum += priorityMap[string(charA)]
 				break
+			}
+		}
+	}
+	return sum, nil
+}
+
+func answerTwo(filePath string) (int, error) {
+	var sum int
+	priorityMap := points.NewLettersToPointsMap()
+	f, err := os.Open(filePath)
+	if err != nil {
+		return 0, err
+	}
+	scanner := bufio.NewScanner(f)
+	var groupedStrings [][]string
+	for scanner.Scan() {
+		curLine := scanner.Text()
+		scanner.Scan()
+		nextLine := scanner.Text()
+		scanner.Scan()
+		nextNextLine := scanner.Text()
+		groupedStrings = append(groupedStrings, []string{curLine, nextLine, nextNextLine})
+	}
+	for _, slice := range groupedStrings {
+		for _, char := range slice[0] {
+			if strings.Contains(slice[1], string(char)) {
+				if strings.Contains(slice[2], string(char)) {
+					sum += priorityMap[string(char)]
+					break
+				}
 			}
 		}
 	}
