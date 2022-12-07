@@ -3,6 +3,9 @@ plan:
 expand each pair
 make each pair a string
 use string.Contains to see if either string fully contains the other
+
+Edit:
+Above plan sucks. Much simpler to mathematically compare.
 */
 
 package main
