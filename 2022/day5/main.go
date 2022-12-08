@@ -14,9 +14,25 @@ var (
 )
 
 func main() {
-	input, err := os.ReadFile(testDataPath)
+	a, err := answerOne(testDataPath)
 	if err != nil {
-		panic(err)
+		fmt.Println("couldn't retrieve answer")
+		fmt.Println(err.Error())
+	}
+	fmt.Println(a)
+}
+
+func reverse(s []string) (reversedSlice []string) {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+	return reversedSlice
+}
+
+func answerOne(filePath string) (string, error) {
+	input, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", err
 	}
 	split := strings.Split(string(input), "\r\n\r\n")
 	drawing := strings.Split(split[0], "\r\n")
@@ -43,7 +59,7 @@ func main() {
 		line := strings.Split(ins, " ")
 		numOfBlocksToMove, err := strconv.Atoi(line[1])
 		if err != nil {
-			panic(err)
+			return "", err
 		}
 		src, err := strconv.Atoi(line[3])
 		if err != nil {
@@ -52,7 +68,7 @@ func main() {
 		src--
 		dest, err := strconv.Atoi(line[5])
 		if err != nil {
-			panic(err)
+			return "", err
 		}
 		dest--
 
@@ -69,13 +85,5 @@ func main() {
 	for _, v := range stacks {
 		ans = append(ans, v[len(v)-1])
 	}
-	fmt.Println(stacks)
-	fmt.Println(strings.Join(ans, ""))
-}
-
-func reverse(s []string) (reversedSlice []string) {
-	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
-		s[i], s[j] = s[j], s[i]
-	}
-	return reversedSlice
+	return strings.Join(ans, ""), nil
 }
