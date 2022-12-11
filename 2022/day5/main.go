@@ -63,6 +63,7 @@ func answerOne(filePath string) (string, error) {
 			stacks[columnCount-1] = append(stacks[columnCount-1], crate)
 		}
 	}
+	// need to reverse the stacks in order to work nicely with append()
 	for _, stack := range stacks {
 		stack = reverse(stack)
 	}
@@ -86,6 +87,8 @@ func answerOne(filePath string) (string, error) {
 		stacksToRemove := stacks[src][len(stacks[src])-numOfBlocksToMove:]
 		sugar.Debugf("ins: %v, moving stacks: %v from src: %v, to dest: %v\n", ins, stacksToRemove, stacks[src], stacks[dest])
 
+		// looping over stacksToRemove starting at the end then adding it to dest. I wanted to just call reverse() on
+		// it, but it wouldn't return the reversed slice.
 		for i := len(stacksToRemove) - 1; i >= 0; i-- {
 			stacks[dest] = append(stacks[dest], stacksToRemove[i])
 		}
@@ -127,6 +130,7 @@ func answerTwo(filePath string) (string, error) {
 			stacks[columnCount-1] = append(stacks[columnCount-1], crate)
 		}
 	}
+	// need to reverse the stacks in order to work nicely with append()
 	for _, stack := range stacks {
 		stack = reverse(stack)
 	}
