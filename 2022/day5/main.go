@@ -5,7 +5,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"unicode"
 )
 
 var (
@@ -43,10 +42,10 @@ func answerOne(filePath string) (string, error) {
 		columnCount := 0
 		for j := 1; j < len(line); j += 4 { // no index stepping like in python, stuck with this
 			columnCount++
-			if unicode.IsSpace(rune(line[j])) { // or you can check if rune == 32
+			if line[j] == 32 { // check if string == ""
 				continue
 			}
-			crate := string(rune(line[j]))
+			crate := string(line[j])
 			stacks[columnCount-1] = append(stacks[columnCount-1], crate)
 		}
 	}
