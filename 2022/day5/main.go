@@ -30,11 +30,11 @@ func main() {
 	fmt.Printf("finished executing in %v\n", time.Since(start))
 }
 
-func reverse(s []string) (reversedSlice []string) {
+func reverse(s []string) []string {
 	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
 		s[i], s[j] = s[j], s[i]
 	}
-	return reversedSlice
+	return s
 }
 
 func answerOne(filePath string) (string, error) {
@@ -85,16 +85,17 @@ func answerOne(filePath string) (string, error) {
 		dest--
 
 		stacksToRemove := stacks[src][len(stacks[src])-numOfBlocksToMove:]
-		sugar.Debugf("ins: %v, moving stacks: %v from src: %v, to dest: %v\n", ins, stacksToRemove, stacks[src], stacks[dest])
+		sugar.Debugf("ins: %v, moving stacks: %v from src: %v, to dest: %v", ins, stacksToRemove, stacks[src], stacks[dest])
 
 		// looping over stacksToRemove starting at the end then adding it to dest. I wanted to just call reverse() on
 		// it, but it wouldn't return the reversed slice.
-		for i := len(stacksToRemove) - 1; i >= 0; i-- {
-			stacks[dest] = append(stacks[dest], stacksToRemove[i])
-		}
+		//for i := len(stacksToRemove) - 1; i >= 0; i-- {
+		//	stacks[dest] = append(stacks[dest], stacksToRemove[i])
+		//}
+		stacks[dest] = append(stacks[dest], reverse(stacksToRemove)...)
 
 		stacks[src] = stacks[src][:len(stacks[src])-numOfBlocksToMove]
-		sugar.Debugf("src: %v, dest: %v\n", stacks[src], stacks[dest])
+		sugar.Debugf("src: %v, dest: %v", stacks[src], stacks[dest])
 	}
 
 	var ans []string
