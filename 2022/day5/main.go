@@ -63,11 +63,9 @@ func answerOne(filePath string) (string, error) {
 			stacks[columnCount-1] = append(stacks[columnCount-1], crate)
 		}
 	}
-
 	for _, stack := range stacks {
 		stack = reverse(stack)
 	}
-
 	for _, ins := range instructions {
 		line := strings.Split(ins, " ")
 		numOfBlocksToMove, err := strconv.Atoi(line[1])
@@ -95,6 +93,7 @@ func answerOne(filePath string) (string, error) {
 		stacks[src] = stacks[src][:len(stacks[src])-numOfBlocksToMove]
 		sugar.Debugf("src: %v, dest: %v\n", stacks[src], stacks[dest])
 	}
+
 	var ans []string
 	for _, v := range stacks {
 		ans = append(ans, v[len(v)-1])
@@ -128,11 +127,9 @@ func answerTwo(filePath string) (string, error) {
 			stacks[columnCount-1] = append(stacks[columnCount-1], crate)
 		}
 	}
-
 	for _, stack := range stacks {
 		stack = reverse(stack)
 	}
-
 	for _, ins := range instructions {
 		line := strings.Split(ins, " ")
 		numOfBlocksToMove, err := strconv.Atoi(line[1])
