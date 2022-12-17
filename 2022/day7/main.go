@@ -135,7 +135,6 @@ func mkFile(name string, size int, parentNode *node) *node {
 func (n *node) seek(target string) *node {
 	for _, child := range n.Children {
 		if child.Name == target {
-			// logger.Debugf("found target node: %v", target)
 			return child
 		}
 	}
