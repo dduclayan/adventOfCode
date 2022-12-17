@@ -17,6 +17,8 @@ var (
 	logger               *zap.SugaredLogger
 	maxSize              = 100000
 	totalSize            = 0
+	fsSize               = 70000000
+	updateSize           = 30000000
 )
 
 type node struct {
@@ -50,7 +52,7 @@ func main() {
 	ppChildren(fs)
 	findBigDirs(fs)
 	fmt.Println(totalSize)
-	// answerTwo(smallInputPath)
+	answerTwo(fs)
 	// fmt.Printf("part one answer: %v\n", a)
 	// fmt.Printf("part two answer: %v\n", b)
 	fmt.Printf("finished executing in %v\n", time.Since(start))
@@ -104,24 +106,58 @@ func createFs(filePath string) *node {
 		}
 		n := mkFile(line[1], fileSz, currentDir)
 		addChild(currentDir, n)
-		currentDir.Size += n.Size
-		if currentDir.Name == "/" {
-			continue
-		}
-		currentDir.Parent.Size += n.Size
-		if currentDir.Parent.Name == "/" {
-			continue
-		}
-		currentDir.Parent.Parent.Size += n.Size
+		logger.Debugf("current node %v adding %v to parent %v", n.Name, n.Size, n.Parent)
+		addSizeUpToRoot(n.Size, n)
+		// logger.Debugf("currFile: %v adding file size %v to Dir %q. dir size: %v", n.Name, n.Size, currentDir.Name, currentDir.Size)
+		// currentDir.Size += n.Size
+		// logger.Debugf("dir %q currentDir size is now %v", currentDir.Name, currentDir.Size)
+		// if currentDir.Name == "/" {
+		// 	continue
+		// }
+		// logger.Debugf("currFile: %v adding file size %v to Dir %q. dir size: %v", n.Name, n.Size, currentDir.Parent.Name, currentDir.Parent.Size)
+		// currentDir.Parent.Size += n.Size
+		// logger.Debugf("Dir %q dir size: %v", currentDir.Parent.Name, currentDir.Parent.Size)
+		// if currentDir.Parent.Name == "/" {
+		// 	continue
+		// }
+		// logger.Debugf("currFile: %v adding file size %v to Dir %q. dir size: %v", n.Name, n.Size, currentDir.Parent.Parent.Name, currentDir.Parent.Parent.Size)
+		// currentDir.Parent.Parent.Size += n.Size
+		// logger.Debugf("Dir %q. dir size: %v", currentDir.Parent.Parent.Name, currentDir.Parent.Parent.Size)
 	}
 	return &root
 }
 
-// func answerTwo(filePath string) {
-// }
+func answerTwo(n *node) {
+	logger.Debugf("size of fs: %v", n.Size)
+	currBytesFree := fsSize - n.Size
+	fmt.Printf("current bytes free=%v\n", currBytesFree)
+	if updateSize > currBytesFree {
+		fmt.Printf("don't have enough space. Need %v bytes\n", currBytesFree-updateSize)
+	}
+
+}
 
 func addChild(parent *node, child *node) {
 	parent.Children = append(parent.Children, child)
+}
+
+func addSizeUpToRoot(s int, n *node) *node {
+	if n == nil {
+		return nil
+	}
+	if n.Parent.Name == "/" && n.Isdir == true {
+		n.Parent.Size += s
+		return nil
+	}
+	if n.Parent.Name == "/" && n.Isdir == false {
+		n.Parent.Size += s
+		return nil
+	}
+	if n.Parent.Isdir == true {
+		n.Parent.Size += s
+		return addSizeUpToRoot(s, n.Parent)
+	}
+	return nil
 }
 
 func mkDir(name string, parentNode *node) *node {
@@ -141,6 +177,29 @@ func (n *node) seek(target string) *node {
 	return nil
 }
 
+func deepSeek(startingNode *node, target string) *node {
+	if startingNode == nil {
+		return nil
+	}
+	if startingNode.Name == target {
+		return startingNode
+	}
+	for _, child := range startingNode.Children {
+		if len(child.Children) > 1 {
+			for _, c := range child.Children {
+				if c.Name == target {
+					return c
+				}
+			}
+		}
+		if child.Name == target {
+			return child
+		}
+		return deepSeek(child, target)
+	}
+	return nil
+}
+
 func findBigDirs(n *node) *node {
 	if n == nil {
 		return nil
@@ -154,19 +213,47 @@ func findBigDirs(n *node) *node {
 	return nil
 }
 
-// TODO(dduclayan): Do this recursively instead.
+// TODO(dduclayan): Find a better way to do this LOL.
 func ppChildren(n *node) *node {
 	if n == nil {
 		return nil
 	}
 	if n.Name == "/" {
-		fmt.Println("/")
+		fmt.Printf("%v %v %v\n", n.Name, n.Isdir, n.Size)
 		for _, v := range n.Children {
 			fmt.Printf("|-- %v %v %v\n", v.Name, v.Isdir, v.Size)
 			for _, i := range v.Children {
 				fmt.Printf("|\t|-- %v %v %v\n", i.Name, i.Isdir, i.Size)
 				for _, j := range i.Children {
 					fmt.Printf("|\t|\t|-- %v %v %v\n", j.Name, j.Isdir, j.Size)
+					for _, k := range j.Children {
+						fmt.Printf("|\t|\t|\t|-- %v %v %v\n", k.Name, k.Isdir, k.Size)
+						for _, l := range k.Children {
+							fmt.Printf("|\t|\t|\t|\t|-- %v %v %v\n", l.Name, l.Isdir, l.Size)
+							for _, m := range l.Children {
+								fmt.Printf("|\t|\t|\t|\t|\t|-- %v %v %v\n", m.Name, m.Isdir, m.Size)
+								for _, p := range m.Children {
+									fmt.Printf("|\t|\t|\t|\t|\t|\t|-- %v %v %v\n", p.Name, p.Isdir, p.Size)
+									for _, r := range p.Children {
+										fmt.Printf("|\t|\t|\t|\t|\t|\t|\t|-- %v %v %v\n", r.Name, r.Isdir, r.Size)
+										for _, s := range r.Children {
+											fmt.Printf("|\t|\t|\t|\t|\t|\t|\t|\t|-- %v %v %v\n", s.Name, s.Isdir, s.Size)
+											for _, t := range s.Children {
+												fmt.Printf("|\t|\t|\t|\t|\t|\t|\t|\t|\t|-- %v %v %v\n", t.Name, t.Isdir, t.Size)
+												for _, u := range t.Children {
+													fmt.Printf("|\t|\t|\t|\t|\t|\t|\t|\t|\t|\t|-- %v %v %v\n", u.Name, u.Isdir, u.Size)
+													for _, w := range u.Children {
+														fmt.Println("****************") // if you see this it means there's more nested children
+														fmt.Printf("|\t|\t|\t|\t|\t|\t|\t|\t|\t|\t|\t|-- %v %v %v\n", w.Name, w.Isdir, w.Size)
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		}

@@ -268,6 +268,94 @@ func TestFindBigDirs(t *testing.T) {
 	}
 }
 
+func TestAddSizeUpToRoot(t *testing.T) {
+	bTxt := &node{
+		Isdir:    false,
+		Name:     "b.txt",
+		Size:     14848514,
+		Parent:   nil,
+		Children: nil,
+	}
+	cDat := &node{
+		Isdir:    false,
+		Name:     "c.dat",
+		Size:     8504156,
+		Parent:   nil,
+		Children: nil,
+	}
+	eDir := &node{
+		Isdir:    true,
+		Name:     "e",
+		Size:     0,
+		Parent:   nil,
+		Children: nil,
+	}
+	// iFile := &node{
+	// 	Isdir:    true,
+	// 	Name:     "i",
+	// 	Size:     0,
+	// 	Parent:   nil,
+	// 	Children: nil,
+	// }
+	// fFile := &node{
+	// 	Isdir:    true,
+	// 	Name:     "f",
+	// 	Size:     0,
+	// 	Parent:   nil,
+	// 	Children: nil,
+	// }
+	// gFile := &node{
+	// 	Isdir:    true,
+	// 	Name:     "g",
+	// 	Size:     0,
+	// 	Parent:   nil,
+	// 	Children: nil,
+	// }
+	// hLst := &node{
+	// 	Isdir:    true,
+	// 	Name:     "h",
+	// 	Size:     0,
+	// 	Parent:   nil,
+	// 	Children: nil,
+	// }
+	aDir := &node{
+		Isdir:    true,
+		Name:     "a",
+		Size:     0,
+		Parent:   nil,
+		Children: nil,
+	}
+	root := &node{
+		Isdir:    true,
+		Name:     "/",
+		Size:     0,
+		Parent:   nil,
+		Children: nil,
+	}
+
+	tests := []struct {
+		testName  string
+		inputNode *node
+		want      int
+	}{
+		{
+			testName:  "small sample",
+			inputNode: generateSmallDeepRootNode(t, root, aDir, eDir, bTxt, cDat),
+			want:      23352670,
+		},
+	}
+
+	for _, tc := range tests {
+		ppChildren(tc.inputNode)
+		addSizeUpToRoot(bTxt.Size, deepSeek(tc.inputNode, "b.txt"))
+		addSizeUpToRoot(cDat.Size, deepSeek(tc.inputNode, "c.dat"))
+		ppChildren(tc.inputNode)
+		if tc.inputNode.Size != tc.want {
+			t.Errorf("addSizeUpToRoot() failed. %v != %v", tc.inputNode.Size, tc.want)
+		}
+	}
+}
+
 func generateRootNode(t *testing.T, rootNode, aNode, eNode, iNode, fNode, gNode, hNode, bNode, cNode, dNode, jNode, dlogNode, dExtNode, kNode *node) *node {
 	t.Helper()
 	rootNode.Children = append(rootNode.Children, aNode, dNode, bNode, cNode)
@@ -288,6 +376,42 @@ func generateRootNode(t *testing.T, rootNode, aNode, eNode, iNode, fNode, gNode,
 	dlogNode.Parent = dNode
 	dExtNode.Parent = dNode
 	kNode.Parent = dNode
+
+	return rootNode
+}
+
+func generateDeepRootNode(t *testing.T, rootNode, aNode, eNode, iNode, fNode, gNode, hNode, bNode, cNode *node) *node {
+	t.Helper()
+	rootNode.Children = append(rootNode.Children, aNode)
+	aNode.Children = append(aNode.Children, eNode)
+	eNode.Children = append(eNode.Children, iNode)
+	iNode.Children = append(eNode.Children, fNode)
+	fNode.Children = append(eNode.Children, gNode)
+	gNode.Children = append(eNode.Children, hNode)
+	hNode.Children = append(eNode.Children, bNode, cNode)
+
+	aNode.Parent = rootNode
+	eNode.Parent = aNode
+	iNode.Parent = eNode
+	fNode.Parent = iNode
+	gNode.Parent = fNode
+	hNode.Parent = gNode
+	bNode.Parent = hNode
+	cNode.Parent = bNode
+
+	return rootNode
+}
+
+func generateSmallDeepRootNode(t *testing.T, rootNode, aNode, eNode, bNode, cNode *node) *node {
+	t.Helper()
+	rootNode.Children = append(rootNode.Children, aNode)
+	aNode.Children = append(aNode.Children, eNode)
+	eNode.Children = append(eNode.Children, bNode, cNode)
+
+	aNode.Parent = rootNode
+	eNode.Parent = aNode
+	bNode.Parent = eNode
+	cNode.Parent = eNode
 
 	return rootNode
 }
