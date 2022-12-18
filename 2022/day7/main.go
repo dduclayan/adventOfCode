@@ -123,6 +123,26 @@ func answerTwo(n *node) {
 	fmt.Println(sizes[i])
 }
 
+func (n *node) seek(target string) *node {
+	for _, child := range n.Children {
+		if child.Name == target {
+			return child
+		}
+	}
+	return nil
+}
+
+func (n *node) dirsizes() []int {
+	res := []int{}
+	if n.Isdir {
+		res = append(res, n.Size)
+		for _, child := range n.Children {
+			res = append(res, child.dirsizes()...)
+		}
+	}
+	return res
+}
+
 func addChild(parent *node, child *node) {
 	parent.Children = append(parent.Children, child)
 }
@@ -154,15 +174,6 @@ func mkFile(name string, size int, parentNode *node) *node {
 	return &node{Name: name, Size: size, Isdir: false, Parent: parentNode}
 }
 
-func (n *node) seek(target string) *node {
-	for _, child := range n.Children {
-		if child.Name == target {
-			return child
-		}
-	}
-	return nil
-}
-
 func deepSeek(startingNode *node, target string) *node {
 	if startingNode == nil {
 		return nil
@@ -184,36 +195,6 @@ func deepSeek(startingNode *node, target string) *node {
 		return deepSeek(child, target)
 	}
 	return nil
-}
-
-func seekDirsWithCertainSize(startingNode *node, target int, high int) *node {
-	logger.Debugf("starting up seekDirsWithCertainSize")
-	for _, child := range startingNode.Children {
-		if len(child.Children) > 1 {
-			for _, c := range child.Children {
-				if c.Size > target && c.Size < high && c.Isdir == true {
-					return c
-				}
-			}
-		}
-		if child.Size > target && child.Size < high && child.Isdir == true {
-			return child
-		}
-		return seekDirsWithCertainSize(child, target, high)
-	}
-	logger.Debugf("didnt find shit. returning nil. starting node is %v", startingNode.Name)
-	return nil
-}
-
-func (n *node) dirsizes() []int {
-	res := []int{}
-	if n.Isdir {
-		res = append(res, n.Size)
-		for _, child := range n.Children {
-			res = append(res, child.dirsizes()...)
-		}
-	}
-	return res
 }
 
 func findBigDirs(n *node) *node {
