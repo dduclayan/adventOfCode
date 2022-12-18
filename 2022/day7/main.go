@@ -6,6 +6,7 @@ import (
 	"go.uber.org/zap"
 	"log"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -49,12 +50,9 @@ func main() {
 	actualInputPath := fmt.Sprintf(testDataPathTemplate, day)
 	// smallInputPath := fmt.Sprintf(actualInputPath, day)
 	fs := createFs(actualInputPath)
-	ppChildren(fs)
 	findBigDirs(fs)
 	fmt.Println(totalSize)
 	answerTwo(fs)
-	// fmt.Printf("part one answer: %v\n", a)
-	// fmt.Printf("part two answer: %v\n", b)
 	fmt.Printf("finished executing in %v\n", time.Since(start))
 }
 
@@ -106,35 +104,23 @@ func createFs(filePath string) *node {
 		}
 		n := mkFile(line[1], fileSz, currentDir)
 		addChild(currentDir, n)
-		logger.Debugf("current node %v adding %v to parent %v", n.Name, n.Size, n.Parent)
 		addSizeUpToRoot(n.Size, n)
-		// logger.Debugf("currFile: %v adding file size %v to Dir %q. dir size: %v", n.Name, n.Size, currentDir.Name, currentDir.Size)
-		// currentDir.Size += n.Size
-		// logger.Debugf("dir %q currentDir size is now %v", currentDir.Name, currentDir.Size)
-		// if currentDir.Name == "/" {
-		// 	continue
-		// }
-		// logger.Debugf("currFile: %v adding file size %v to Dir %q. dir size: %v", n.Name, n.Size, currentDir.Parent.Name, currentDir.Parent.Size)
-		// currentDir.Parent.Size += n.Size
-		// logger.Debugf("Dir %q dir size: %v", currentDir.Parent.Name, currentDir.Parent.Size)
-		// if currentDir.Parent.Name == "/" {
-		// 	continue
-		// }
-		// logger.Debugf("currFile: %v adding file size %v to Dir %q. dir size: %v", n.Name, n.Size, currentDir.Parent.Parent.Name, currentDir.Parent.Parent.Size)
-		// currentDir.Parent.Parent.Size += n.Size
-		// logger.Debugf("Dir %q. dir size: %v", currentDir.Parent.Parent.Name, currentDir.Parent.Parent.Size)
 	}
 	return &root
 }
 
 func answerTwo(n *node) {
+	// ppChildren(n)
 	logger.Debugf("size of fs: %v", n.Size)
 	currBytesFree := fsSize - n.Size
-	fmt.Printf("current bytes free=%v\n", currBytesFree)
+	logger.Debugf("current bytes free=%v\n", currBytesFree)
 	if updateSize > currBytesFree {
-		fmt.Printf("don't have enough space. Need %v bytes\n", currBytesFree-updateSize)
+		fmt.Printf("don't have enough space. Need %v bytes\n", updateSize-currBytesFree)
 	}
-
+	sizes := n.dirsizes()
+	sort.Ints(sizes)
+	i := sort.Search(len(sizes), func(i int) bool { return sizes[i] >= updateSize-currBytesFree })
+	fmt.Println(sizes[i])
 }
 
 func addChild(parent *node, child *node) {
@@ -198,6 +184,36 @@ func deepSeek(startingNode *node, target string) *node {
 		return deepSeek(child, target)
 	}
 	return nil
+}
+
+func seekDirsWithCertainSize(startingNode *node, target int, high int) *node {
+	logger.Debugf("starting up seekDirsWithCertainSize")
+	for _, child := range startingNode.Children {
+		if len(child.Children) > 1 {
+			for _, c := range child.Children {
+				if c.Size > target && c.Size < high && c.Isdir == true {
+					return c
+				}
+			}
+		}
+		if child.Size > target && child.Size < high && child.Isdir == true {
+			return child
+		}
+		return seekDirsWithCertainSize(child, target, high)
+	}
+	logger.Debugf("didnt find shit. returning nil. starting node is %v", startingNode.Name)
+	return nil
+}
+
+func (n *node) dirsizes() []int {
+	res := []int{}
+	if n.Isdir {
+		res = append(res, n.Size)
+		for _, child := range n.Children {
+			res = append(res, child.dirsizes()...)
+		}
+	}
+	return res
 }
 
 func findBigDirs(n *node) *node {
