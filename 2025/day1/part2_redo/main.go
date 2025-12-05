@@ -28,7 +28,8 @@ func (d *dial) nextPosition(instruction string) error {
 
 	case "L":
 		for i := 0; i < clicks; i++ {
-			// so we don't double count zeros
+			// Solves the issue of ending AND starting at zero. If we ended on 0 on the last rotation reset the dial
+			// so we're not counting back into negative numbers.
 			if d.position == 0 && d.reachedZeroLastRotation == true {
 				d.position = 100
 				d.position--
@@ -45,7 +46,8 @@ func (d *dial) nextPosition(instruction string) error {
 
 	case "R":
 		for i := 0; i < clicks; i++ {
-			// so we don't double count zeros
+			// Solves the issue of ending AND starting at zero. If we ended on 100 on the last rotation reset the dial
+			// to prevent the dial from going above 100.
 			if d.position == 100 && d.reachedZeroLastRotation == true {
 				d.position = 0
 				d.position++
