@@ -16,12 +16,12 @@ func TestSumInvalidIDs(t *testing.T) {
 		{
 			name:  "case_2",
 			input: "11-22,95-115",
-			want:  132,
+			want:  243,
 		},
 		{
 			name:  "case_3",
 			input: "998-1012",
-			want:  1010,
+			want:  2009,
 		},
 		{
 			name:  "case_4",
@@ -52,6 +52,16 @@ func TestSumInvalidIDs(t *testing.T) {
 			name:  "case_9",
 			input: "824824821-824824827",
 			want:  824824824,
+		},
+		{
+			name:  "case_10",
+			input: "1-22",
+			want:  33,
+		},
+		{
+			name:  "case_11",
+			input: "11111-11112",
+			want:  11111,
 		},
 	}
 
