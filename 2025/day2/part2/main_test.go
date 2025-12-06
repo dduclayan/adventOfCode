@@ -63,6 +63,11 @@ func TestSumInvalidIDs(t *testing.T) {
 			input: "11111-11112",
 			want:  11111,
 		},
+		{
+			name:  "case_12",
+			input: "12-13",
+			want:  0,
+		},
 	}
 
 	for _, tt := range tests {
